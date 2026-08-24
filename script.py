@@ -24,7 +24,6 @@ def get_us_data():
     return res
 
 def get_cn_data():
-    # 针对海外 GitHub Actions 服务器环境，优先使用 yfinance 抓取 A 股指数
     cn_symbols = {'000001.SS': '上证指数', '399001.SZ': '深证成指', '399006.SZ': '创业板指'}
     res = []
     for sym, name in cn_symbols.items():
@@ -36,70 +35,62 @@ def get_cn_data():
                 prev = hist['Close'].iloc[-2]
                 pct = round(((close - prev) / prev) * 100, 2)
                 res.append({'name': name, 'price': round(close, 2), 'change': pct})
+            else:
+                res.append({'name': name, 'price': '暂无', 'change': 0.0})
         except Exception as e:
             print(f"获取 A 股 {sym} 失败:", e)
-    
-    # 如果 yfinance 未拉取到，尝试调用 akshare 兜底
-    if not res:
-        try:
-            import akshare as ak
-            df = ak.stock_zh_a_spot_em()
-            mapping = {'上证指数': '000001', '深证成指': '399001', '创业板指': '399006'}
-            for name, code in mapping.items():
-                row = df[df['代码'] == code]
-                if not row.empty:
-                    res.append({
-                        'name': name,
-                        'price': round(float(row['最新价'].values[0]), 2),
-                        'change': round(float(row['涨跌幅'].values[0]), 2)
-                    })
-        except Exception as e:
-            print("AKshare 获取 A 股失败:", e)
-            
+            res.append({'name': name, 'price': '获取失败', 'change': 0.0})
     return res
 
 def analyze_with_deepseek(prompt_text):
     if not DEEPSEEK_KEY:
-        return "未检测到正确的 DEEPSEEK_KEY，请检查 GitHub Secrets 设置。"
-    headers = {"Authorization": f"Bearer {DEEPSEEK_KEY}", "Content-Type": "application/json"}
+        return "未读取到 DEEPSEEK_KEY，请检查 GitHub Secrets 名称是否准确。"
+    headers = {
+        "Authorization": f"Bearer {DEEPSEEK_KEY}",
+        "Content-Type": "application/json"
+    }
     payload = {
         "model": "deepseek-chat",
         "messages": [{"role": "user", "content": prompt_text}],
         "max_tokens": 150
     }
     try:
-        res = requests.post("https://api.deepseek.com/chat/completions", json=payload, headers=headers, timeout=10)
-        return res.json()['choices'][0]['message']['content']
+        # 使用 DeepSeek 兼容的官方 Endpoint
+        res = requests.post("https://api.deepseek.com/v1/chat/completions", json=payload, headers=headers, timeout=10)
+        data = res.json()
+        if 'choices' in data:
+            return data['choices'][0]['message']['content']
+        else:
+            return f"API 返回异常: {data.get('error', {}).get('message', '未知错误')}"
     except Exception as e:
-        return f"AI 推演生成异常: {e}"
+        return f"DeepSeek 请求失败: {e}"
 
 def get_macro_events():
     macro_list = []
     if not FINNHUB_KEY:
-        macro_list.append({
+        return [{
             'country': '⚠️',
-            'event_name': '密钥未配置',
+            'event_name': 'Finnhub Key 未配置',
             'stars': '★',
-            'actual': '无',
-            'estimate': '无',
-            'prev': '无',
-            'ai_insight': '请在 GitHub Secrets 配置 FINNHUB_KEY。'
-        })
-        return macro_list
+            'actual': '-',
+            'estimate': '-',
+            'prev': '-',
+            'ai_insight': '请检查 GitHub Secrets 中的 FINNHUB_KEY。'
+        }]
 
-    # 查询今日起未来几天的日历数据
     today = datetime.datetime.utcnow().strftime("%Y-%m-%d")
     future = (datetime.datetime.utcnow() + datetime.timedelta(days=7)).strftime("%Y-%m-%d")
     url = f"https://finnhub.io/api/v1/calendar/economic?from={today}&to={future}&token={FINNHUB_KEY}"
     
     try:
         r = requests.get(url, timeout=10).json()
-        events = r.get('economicCalendar', [])[:3]
+        events = r.get('economicCalendar', [])
         
-        for ev in events:
+        # 筛选重要度较高的前 3 个事件
+        for ev in events[:3]:
             actual = ev.get('actual') if ev.get('actual') is not None else '待公布'
             estimate = ev.get('estimate') if ev.get('estimate') is not None else '待预测'
-            event_name = ev.get('event', '核心经济事件')
+            event_name = ev.get('event', '重磅宏观数据')
             
             prompt = f"宏观事件：{event_name}，预期：{estimate}，公布：{actual}。分析对股市和黄金的影响。"
             ai_insight = analyze_with_deepseek(prompt)
@@ -119,12 +110,12 @@ def get_macro_events():
     if not macro_list:
         macro_list.append({
             'country': '🌐',
-            'event_name': '近期暂无重磅宏观公布',
+            'event_name': '本周暂无核心宏观事件发布',
             'stars': '★★★',
             'actual': '-',
             'estimate': '-',
             'prev': '-',
-            'ai_insight': '当前时间段 Finnhub 暂未返回核心经济事件数据。'
+            'ai_insight': 'Finnhub 接口当前返回空数据。'
         })
         
     return macro_list
@@ -147,7 +138,7 @@ def build_html():
 
     with open("index.html", "w", encoding="utf-8") as f:
         f.write(html_out)
-    print("index.html 更新完毕！")
+    print("index.html 更新成功！")
 
 if __name__ == "__main__":
     build_html()
