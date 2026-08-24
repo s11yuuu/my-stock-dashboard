@@ -2,68 +2,73 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>中美股市与宏观监控</title>
+    <title>股市与宏观监控面板</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f9; color: #333; margin: 0; padding: 20px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f6f8; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 1000px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .card { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .card h3 { margin-top: 0; font-size: 16px; color: #666; }
-        .card .price { font-size: 24px; font-weight: bold; margin: 5px 0; }
-        .up { color: #d93025; font-weight: bold; }
-        .down { color: #188038; font-weight: bold; }
-        .macro-card { background: #ffffff; border-left: 5px solid #1a73e8; margin-bottom: 15px; padding: 15px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-        .macro-header { font-weight: bold; font-size: 16px; margin-bottom: 8px; display: flex; justify-content: space-between; }
-        .macro-impact { font-size: 14px; color: #333; background: #e8f0fe; padding: 10px 12px; border-radius: 4px; margin-top: 8px; line-height: 1.5; }
-        .time-tag { font-size: 12px; color: #888; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .card { background: #fff; padding: 18px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .card .title { font-size: 14px; color: #666; font-weight: 600; margin-bottom: 8px; }
+        .card .price { font-size: 22px; font-weight: bold; margin-bottom: 4px; }
+        .green { color: #00b060; } .red { color: #ff3b30; }
+        .macro-card { background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid #0066ff; }
+        .ai-box { background: #f0f5ff; padding: 12px; border-radius: 8px; font-size: 13px; line-height: 1.5; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h2>中美股市与宏观数据监控</h2>
-            <span class="time-tag">更新时间 (UTC): {{ update_time }}</span>
-        </div>
+<div class="container">
+    <div class="header">
+        <h2>中美股市与宏观数据监控</h2>
+        <span style="font-size: 12px; color: #888;">后台同步: {{ update_time }} (UTC) | <span id="live-status" style="color:#00b060;">● 前端实时轮询中</span></span>
+    </div>
 
-        <h3>🇺🇸 美股指数及核心标的</h3>
-        <div class="grid">
-            {% for item in us_stocks %}
-            <div class="card">
-                <h3>{{ item.name }}</h3>
-                <div class="price">{{ item.price }}</div>
-                <div class="{{ 'up' if item.change > 0 else 'down' }}">
-                    {{ '+' if item.change > 0 else '' }}{{ item.change }}%
-                </div>
+    <h3>🇺🇸 美股指数及关注标的</h3>
+    <div class="grid">
+        {% for item in us_stocks %}
+        <div class="card">
+            <div class="title">{{ item.name }}</div>
+            <div class="price">{{ item.price }}</div>
+            <div class="change {% if item.change >= 0 %}red{% else %}green{% endif %}">
+                {{ item.change }}%
             </div>
-            {% endfor %}
-        </div>
-
-        <h3>🇨🇳 A股核心指数</h3>
-        <div class="grid">
-            {% for item in cn_stocks %}
-            <div class="card">
-                <h3>{{ item.name }}</h3>
-                <div class="price">{{ item.price }}</div>
-                <div class="{{ 'up' if item.change > 0 else 'down' }}">
-                    {{ '+' if item.change > 0 else '' }}{{ item.change }}%
-                </div>
-            </div>
-            {% endfor %}
-        </div>
-
-        <h3>📅 宏观事件与 DeepSeek 利多/利空推演</h3>
-        {% for event in macro_events %}
-        <div class="macro-card">
-            <div class="macro-header">
-                <span>{{ event.country }} {{ event.event_name }}</span>
-                <span>重要性: {{ event.stars }}</span>
-            </div>
-            <div>公布: <strong>{{ event.actual }}</strong> | 预期: {{ event.estimate }} | 前值: {{ event.prev }}</div>
-            <div class="macro-impact">💡 <strong>AI 洞察：</strong> {{ event.ai_insight }}</div>
         </div>
         {% endfor %}
     </div>
+
+    <h3>🇨🇳 A股核心指数与关注标的</h3>
+    <div class="grid">
+        {% for item in cn_stocks %}
+        <div class="card">
+            <div class="title">{{ item.name }}</div>
+            <div class="price">{{ item.price }}</div>
+            <div class="change {% if item.change >= 0 %}red{% else %}green{% endif %}">
+                {{ item.change }}%
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <h3>📅 宏观事件与 DeepSeek 推演</h3>
+    {% for ev in macro_events %}
+    <div class="macro-card">
+        <div style="font-weight: bold; font-size: 16px;">{{ ev.country }} {{ ev.name }} <span style="font-size: 12px; color: #888;">({{ ev.date }})</span></div>
+        <div style="font-size: 13px; color: #555; margin-top: 5px;">背景说明: {{ ev.impact }}</div>
+        <div class="ai-box">
+            💡 <strong>DeepSeek 洞察：</strong> {{ ev.ai_insight }}
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<!-- 前端自动刷新倒计时逻辑 -->
+<script>
+    // 每 30 秒自动刷新一次网页拉取最新的编译数据
+    setInterval(function() {
+        fetch(window.location.href, {cache: "no-store"}).then(function() {
+            window.location.reload();
+        });
+    }, 30000);
+</script>
 </body>
 </html>
