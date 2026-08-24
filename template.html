@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中美股市与宏观监控</title>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f9; color: #333; margin: 0; padding: 20px; }
+        .container { max-width: 1000px; margin: 0 auto; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .card { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
+        .card h3 { margin-top: 0; font-size: 16px; color: #666; }
+        .card .price { font-size: 24px; font-weight: bold; margin: 5px 0; }
+        .up { color: #d93025; font-weight: bold; }
+        .down { color: #188038; font-weight: bold; }
+        .macro-card { background: #ffffff; border-left: 5px solid #1a73e8; margin-bottom: 15px; padding: 15px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
+        .macro-header { font-weight: bold; font-size: 16px; margin-bottom: 8px; display: flex; justify-content: space-between; }
+        .macro-impact { font-size: 14px; color: #333; background: #e8f0fe; padding: 10px 12px; border-radius: 4px; margin-top: 8px; line-height: 1.5; }
+        .time-tag { font-size: 12px; color: #888; }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h2>中美股市与宏观数据监控</h2>
+            <span class="time-tag">更新时间 (UTC): {{ update_time }}</span>
+        </div>
+
+        <h3>🇺🇸 美股指数及核心标的</h3>
+        <div class="grid">
+            {% for item in us_stocks %}
+            <div class="card">
+                <h3>{{ item.name }}</h3>
+                <div class="price">{{ item.price }}</div>
+                <div class="{{ 'up' if item.change > 0 else 'down' }}">
+                    {{ '+' if item.change > 0 else '' }}{{ item.change }}%
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <h3>🇨🇳 A股核心指数</h3>
+        <div class="grid">
+            {% for item in cn_stocks %}
+            <div class="card">
+                <h3>{{ item.name }}</h3>
+                <div class="price">{{ item.price }}</div>
+                <div class="{{ 'up' if item.change > 0 else 'down' }}">
+                    {{ '+' if item.change > 0 else '' }}{{ item.change }}%
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <h3>📅 宏观事件与 DeepSeek 利多/利空推演</h3>
+        {% for event in macro_events %}
+        <div class="macro-card">
+            <div class="macro-header">
+                <span>{{ event.country }} {{ event.event_name }}</span>
+                <span>重要性: {{ event.stars }}</span>
+            </div>
+            <div>公布: <strong>{{ event.actual }}</strong> | 预期: {{ event.estimate }} | 前值: {{ event.prev }}</div>
+            <div class="macro-impact">💡 <strong>AI 洞察：</strong> {{ event.ai_insight }}</div>
+        </div>
+        {% endfor %}
+    </div>
+</body>
+</html>
