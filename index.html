@@ -2,108 +2,161 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>中美股市与宏观监控</title>
+    <title>股市与宏观监控面板</title>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f4f6f9; color: #333; margin: 0; padding: 20px; }
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f6f8; margin: 0; padding: 20px; color: #333; }
         .container { max-width: 1000px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; border-bottom: 2px solid #ddd; padding-bottom: 10px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .card { background: white; padding: 18px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.05); }
-        .card h3 { margin-top: 0; font-size: 16px; color: #666; }
-        .card .price { font-size: 24px; font-weight: bold; margin: 5px 0; }
-        .up { color: #d93025; font-weight: bold; }
-        .down { color: #188038; font-weight: bold; }
-        .macro-card { background: #ffffff; border-left: 5px solid #1a73e8; margin-bottom: 15px; padding: 15px; border-radius: 6px; box-shadow: 0 2px 5px rgba(0,0,0,0.03); }
-        .macro-header { font-weight: bold; font-size: 16px; margin-bottom: 8px; display: flex; justify-content: space-between; }
-        .macro-impact { font-size: 14px; color: #333; background: #e8f0fe; padding: 10px 12px; border-radius: 4px; margin-top: 8px; line-height: 1.5; }
-        .time-tag { font-size: 12px; color: #888; }
+        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
+        .card { background: #fff; padding: 18px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
+        .card .title { font-size: 14px; color: #666; font-weight: 600; margin-bottom: 8px; }
+        .card .price { font-size: 22px; font-weight: bold; margin-bottom: 4px; }
+        .green { color: #00b060; } .red { color: #ff3b30; }
+        .macro-card { background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid #0066ff; }
+        .ai-box { background: #f0f5ff; padding: 12px; border-radius: 8px; font-size: 13px; line-height: 1.5; margin-top: 10px; }
     </style>
 </head>
 <body>
-    <div class="container">
-        <div class="header">
-            <h2>中美股市与宏观数据监控</h2>
-            <span class="time-tag">更新时间 (UTC): 2026-08-24 15:29:57</span>
-        </div>
+<div class="container">
+    <div class="header">
+        <h2>中美股市与宏观数据监控</h2>
+        <span style="font-size: 12px; color: #888;">后台同步: 2026-08-24 15:48:27 (UTC) | <span id="live-status" style="color:#00b060;">● 前端实时轮询中</span></span>
+    </div>
 
-        <h3>🇺🇸 美股指数及核心标的</h3>
-        <div class="grid">
-            
-            <div class="card">
-                <h3>标普 500</h3>
-                <div class="price">7655.16</div>
-                <div class="down">
-                    -0.25%
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3>纳斯达克</h3>
-                <div class="price">26054.93</div>
-                <div class="down">
-                    -0.48%
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3>纳指 ETF</h3>
-                <div class="price">706.8</div>
-                <div class="down">
-                    -0.93%
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3>英伟达</h3>
-                <div class="price">209.85</div>
-                <div class="down">
-                    -2.27%
-                </div>
-            </div>
-            
-        </div>
-
-        <h3>🇨🇳 A股核心指数</h3>
-        <div class="grid">
-            
-            <div class="card">
-                <h3>上证指数</h3>
-                <div class="price">3882.01</div>
-                <div class="down">
-                    -0.59%
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3>深证成指</h3>
-                <div class="price">13794.29</div>
-                <div class="down">
-                    -2.13%
-                </div>
-            </div>
-            
-            <div class="card">
-                <h3>创业板指</h3>
-                <div class="price">暂无</div>
-                <div class="down">
-                    0.0%
-                </div>
-            </div>
-            
-        </div>
-
-        <h3>📅 宏观事件与 DeepSeek 利多/利空推演</h3>
+    <h3>🇺🇸 美股指数及关注标的</h3>
+    <div class="grid">
         
-        <div class="macro-card">
-            <div class="macro-header">
-                <span>🌐 本周暂无核心宏观事件发布</span>
-                <span>重要性: ★★★</span>
+        <div class="card">
+            <div class="title">标普 500</div>
+            <div class="price">7663.32</div>
+            <div class="change green">
+                -0.14%
             </div>
-            <div>公布: <strong>-</strong> | 预期: - | 前值: -</div>
-            <div class="macro-impact">💡 <strong>AI 洞察：</strong> Finnhub 接口当前返回空数据。</div>
+        </div>
+        
+        <div class="card">
+            <div class="title">纳斯达克</div>
+            <div class="price">26095.15</div>
+            <div class="change green">
+                -0.33%
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="title">纳指 100 ETF (QQQM)</div>
+            <div class="price">291.73</div>
+            <div class="change green">
+                -0.69%
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="title">英伟达 (NVDA)</div>
+            <div class="price">210.51</div>
+            <div class="change green">
+                -1.96%
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="title">特斯拉 (TSLA)</div>
+            <div class="price">357.67</div>
+            <div class="change green">
+                -1.43%
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="title">RoundhillETF (DRAM)</div>
+            <div class="price">54.49</div>
+            <div class="change green">
+                -5.52%
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="title">SK海力士 (SKHY)</div>
+            <div class="price">156.55</div>
+            <div class="change green">
+                -4.2%
+            </div>
         </div>
         
     </div>
+
+    <h3>🇨🇳 A股核心指数与关注标的</h3>
+    <div class="grid">
+        
+        <div class="card">
+            <div class="title">上证指数</div>
+            <div class="price">3882.01</div>
+            <div class="change green">
+                -0.59%
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="title">深证成指</div>
+            <div class="price">13794.29</div>
+            <div class="change green">
+                -2.13%
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="title">创业板指</div>
+            <div class="price">--</div>
+            <div class="change red">
+                0.0%
+            </div>
+        </div>
+        
+        <div class="card">
+            <div class="title">宁德时代</div>
+            <div class="price">387.89</div>
+            <div class="change green">
+                -0.83%
+            </div>
+        </div>
+        
+    </div>
+
+    <h3>📅 宏观事件与 DeepSeek 推演</h3>
+    
+    <div class="macro-card">
+        <div style="font-weight: bold; font-size: 16px;">🇺🇸 美联储利率决议 & 鲍威尔讲话 <span style="font-size: 12px; color: #888;">(近期重点)</span></div>
+        <div style="font-size: 13px; color: #555; margin-top: 5px;">背景说明: 决定美科技股与流动性走向</div>
+        <div class="ai-box">
+            💡 <strong>DeepSeek 洞察：</strong> AI 推演异常: Expecting value: line 1 column 1 (char 0)
+        </div>
+    </div>
+    
+    <div class="macro-card">
+        <div style="font-weight: bold; font-size: 16px;">🇺🇸 美国非农就业与 CPI 数据 <span style="font-size: 12px; color: #888;">(本周公布)</span></div>
+        <div style="font-size: 13px; color: #555; margin-top: 5px;">背景说明: 影响降息预期与美债收益率</div>
+        <div class="ai-box">
+            💡 <strong>DeepSeek 洞察：</strong> AI 推演异常: Expecting value: line 1 column 1 (char 0)
+        </div>
+    </div>
+    
+    <div class="macro-card">
+        <div style="font-weight: bold; font-size: 16px;">🇨🇳 中国 LPR 利率及宏观刺激政策 <span style="font-size: 12px; color: #888;">(月度节点)</span></div>
+        <div style="font-size: 13px; color: #555; margin-top: 5px;">背景说明: 直接牵动 A 股/港股估值修复</div>
+        <div class="ai-box">
+            💡 <strong>DeepSeek 洞察：</strong> AI 推演异常: Expecting value: line 1 column 1 (char 0)
+        </div>
+    </div>
+    
+</div>
+
+<!-- 前端自动刷新倒计时逻辑 -->
+<script>
+    // 每 30 秒自动刷新一次网页拉取最新的编译数据
+    setInterval(function() {
+        fetch(window.location.href, {cache: "no-store"}).then(function() {
+            window.location.reload();
+        });
+    }, 30000);
+</script>
 </body>
 </html>
