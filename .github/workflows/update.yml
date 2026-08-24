@@ -1,8 +1,8 @@
 name: Auto Update Stock HTML
 
 on:
-  schedule:
-    - cron: '0 1,13 * * *'  # 每天 UTC 时间 1:00 和 13:00 自动触发更新
+ schedule:
+    - cron: '0 * * * *'  # 每 1 小时自动拉取数据并重新渲染 HTML 页面
   workflow_dispatch:          # 支持在 GitHub 界面手动触发更新
 
 jobs:
