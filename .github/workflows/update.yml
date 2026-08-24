@@ -1,17 +1,17 @@
 name: Auto Update Stock HTML
 
+name: Auto Update Stock HTML
+
 on:
- schedule:
-    - cron: '0 * * * *'  # 每 1 小时自动拉取数据并重新渲染 HTML 页面
-  workflow_dispatch:          # 支持在 GitHub 界面手动触发更新
+  schedule:
+    - cron: '0 * * * *'  # 每 1 小时自动运行
+  workflow_dispatch:      # 👈 添加这一行，GitHub Actions 页面就会出现 Run workflow 手动执行按钮
 
 jobs:
   build:
     runs-on: ubuntu-latest
-    permissions:
-      contents: write
     steps:
-      - name: Checkout Repo
+      - name: Checkout Repository
         uses: actions/checkout@v3
 
       - name: Set up Python
@@ -19,19 +19,21 @@ jobs:
         with:
           python-version: '3.10'
 
-      - name: Install dependencies
-        run: pip install -r requirements.txt
+      - name: Install Dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
 
-      - name: Run Update Script
+      - name: Run Script
         env:
           FINNHUB_KEY: ${{ secrets.FINNHUB_KEY }}
           DEEPSEEK_KEY: ${{ secrets.DEEPSEEK_KEY }}
         run: python script.py
 
-      - name: Commit and Push index.html
+      - name: Commit and Push Changes
         run: |
-          git config --global user.name "github-actions[bot]"
-          git config --global user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
           git add index.html
-          git commit -m "Auto update index.html" || exit 0
+          git commit -m "Auto update stock data" || exit 0
           git push
