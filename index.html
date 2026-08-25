@@ -2,204 +2,316 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>股市与宏观监控面板</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中美市场脉冲 | Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f6f8; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 1000px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .card { background: #fff; padding: 18px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-        .card .title { font-size: 14px; color: #666; font-weight: 600; margin-bottom: 8px; }
-        .card .price { font-size: 22px; font-weight: bold; margin-bottom: 4px; }
-        .green { color: #00b060; } .red { color: #ff3b30; }
-        .macro-card { background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid #0066ff; }
-        .ai-box { background: #f0f5ff; padding: 12px; border-radius: 8px; font-size: 13px; line-height: 1.5; margin-top: 10px; }
+        body {
+            background-color: #0b0f19;
+            color: #e2e8f0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .terminal-card {
+            background: #111827;
+            border: 1px solid #1f2937;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .up-red { color: #f87171; }
+        .down-green { color: #4ade80; }
+        .up-green-us { color: #4ade80; }
+        .down-red-us { color: #f87171; }
     </style>
 </head>
-<body>
-<div class="container">
-    <div class="header">
-        <h2>中美股市与宏观数据监控</h2>
-        <span style="font-size: 12px; color: #888;">后台同步: 2026-08-25 14:49:18 (北京时间) (UTC) | <span id="live-status" style="color:#00b060;">● 前端实时轮询中</span></span>
+<body class="p-4 md:p-8 max-w-7xl mx-auto">
+
+    <!-- 顶部 Header -->
+    <header class="terminal-card rounded-xl p-6 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center">
+        <div>
+            <div class="text-xs font-mono text-cyan-400 tracking-wider mb-1">MARKET INTELLIGENCE TERMINAL</div>
+            <h1 class="text-2xl font-bold text-white tracking-tight">中美市场脉冲</h1>
+            <p class="text-xs text-gray-400 mt-1">跨市场行情、宏观事件与 DeepSeek 情景推演，小时级静态快照呈现。</p>
+        </div>
+        <div class="mt-4 md:mt-0 flex items-center gap-4 text-xs font-mono">
+            <div class="bg-gray-800/80 px-3 py-2 rounded-lg border border-gray-700">
+                <span class="text-gray-400">SYSTEM UPDATED:</span>
+                <span class="text-cyan-400 font-bold ml-1">2026-08-25 15:33:42 (北京时间)</span>
+            </div>
+            <div class="bg-gray-800/80 px-3 py-2 rounded-lg border border-gray-700 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-gray-300">数据快照已载入</span>
+            </div>
+        </div>
+    </header>
+
+    <!-- 主体 Grid 网格：美股与 A股 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        
+        <!-- 美股 & 大宗商品 -->
+        <section class="terminal-card rounded-xl p-5">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-800">
+                <div>
+                    <span class="text-[10px] font-mono text-cyan-400 block">GLOBAL MARKETS</span>
+                    <h2 class="text-base font-bold text-white">美股 · 大宗商品</h2>
+                </div>
+                <span class="text-[10px] text-gray-500 font-mono">国际色彩：绿涨红跌</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="标普 500">标普 500</div>
+                    <div class="text-lg font-mono font-bold text-white">7652.86</div>
+                    <div class="text-xs font-mono mt-1 
+                        down-red-us">
+                        -0.28%
+                    </div>
+                </div>
+                
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="纳斯达克">纳斯达克</div>
+                    <div class="text-lg font-mono font-bold text-white">25980.19</div>
+                    <div class="text-xs font-mono mt-1 
+                        down-red-us">
+                        -0.76%
+                    </div>
+                </div>
+                
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="纳指 100 ETF (QQQM)">纳指 100 ETF (QQQM)</div>
+                    <div class="text-lg font-mono font-bold text-white">290.81</div>
+                    <div class="text-xs font-mono mt-1 
+                        down-red-us">
+                        -1.0%
+                    </div>
+                </div>
+                
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="英伟达 (NVDA)">英伟达 (NVDA)</div>
+                    <div class="text-lg font-mono font-bold text-white">208.48</div>
+                    <div class="text-xs font-mono mt-1 
+                        down-red-us">
+                        -2.91%
+                    </div>
+                </div>
+                
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="特斯拉 (TSLA)">特斯拉 (TSLA)</div>
+                    <div class="text-lg font-mono font-bold text-white">348.95</div>
+                    <div class="text-xs font-mono mt-1 
+                        down-red-us">
+                        -3.83%
+                    </div>
+                </div>
+                
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="Roundhill ETF (DRAM)">Roundhill ETF (DRAM)</div>
+                    <div class="text-lg font-mono font-bold text-white">54.28</div>
+                    <div class="text-xs font-mono mt-1 
+                        down-red-us">
+                        -5.89%
+                    </div>
+                </div>
+                
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="SK海力士 (SKHY)">SK海力士 (SKHY)</div>
+                    <div class="text-lg font-mono font-bold text-white">155.37</div>
+                    <div class="text-xs font-mono mt-1 
+                        down-red-us">
+                        -4.92%
+                    </div>
+                </div>
+                
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="VIX 恐慌指数">VIX 恐慌指数</div>
+                    <div class="text-lg font-mono font-bold text-white">15.75</div>
+                    <div class="text-xs font-mono mt-1 
+                        down-red-us">
+                        -0.63%
+                    </div>
+                </div>
+                
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="NYMEX 原油">NYMEX 原油</div>
+                    <div class="text-lg font-mono font-bold text-white">84.33</div>
+                    <div class="text-xs font-mono mt-1 
+                        down-red-us">
+                        -0.8%
+                    </div>
+                </div>
+                
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="COMEX 黄金">COMEX 黄金</div>
+                    <div class="text-lg font-mono font-bold text-white">4699.6</div>
+                    <div class="text-xs font-mono mt-1 
+                        up-green-us">
+                        +1.27%
+                    </div>
+                </div>
+                
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="COMEX 白银">COMEX 白银</div>
+                    <div class="text-lg font-mono font-bold text-white">68.41</div>
+                    <div class="text-xs font-mono mt-1 
+                        down-red-us">
+                        -0.19%
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+
+        <!-- A 股核心标的 -->
+        <section class="terminal-card rounded-xl p-5">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-800">
+                <div>
+                    <span class="text-[10px] font-mono text-cyan-400 block">CHINA A-SHARES</span>
+                    <h2 class="text-base font-bold text-white">A 股核心标的</h2>
+                </div>
+                <span class="text-[10px] text-gray-500 font-mono">中国色彩：红涨绿跌</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="上证指数">上证指数</div>
+                    <div class="text-lg font-mono font-bold text-white">3889.44</div>
+                    <div class="text-xs font-mono mt-1 
+                        up-red">
+                        +0.19%
+                    </div>
+                </div>
+                
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="深证成指">深证成指</div>
+                    <div class="text-lg font-mono font-bold text-white">13745.87</div>
+                    <div class="text-xs font-mono mt-1 
+                        down-green">
+                        -0.35%
+                    </div>
+                </div>
+                
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="创业板指">创业板指</div>
+                    <div class="text-lg font-mono font-bold text-white">3397.52</div>
+                    <div class="text-xs font-mono mt-1 
+                        down-green">
+                        -1.0%
+                    </div>
+                </div>
+                
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="新易盛">新易盛</div>
+                    <div class="text-lg font-mono font-bold text-white">400.87</div>
+                    <div class="text-xs font-mono mt-1 
+                        down-green">
+                        -2.7%
+                    </div>
+                </div>
+                
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="四川黄金">四川黄金</div>
+                    <div class="text-lg font-mono font-bold text-white">55.0</div>
+                    <div class="text-xs font-mono mt-1 
+                        down-green">
+                        -2.83%
+                    </div>
+                </div>
+                
+            </div>
+        </section>
+
     </div>
 
-    <h3>🇺🇸 美股指数及关注标的</h3>
-    <div class="grid">
-        
-        <div class="card">
-            <div class="title">标普 500</div>
-            <div class="price">7652.86</div>
-            <div class="change green">
-                -0.28%
+    <!-- 宏观事件与 DeepSeek 推演 -->
+    <section class="terminal-card rounded-xl p-5 mb-6">
+        <div class="flex justify-between items-center mb-6 pb-2 border-b border-gray-800">
+            <div>
+                <span class="text-[10px] font-mono text-cyan-400 block">MACRO EVENT RADAR</span>
+                <h2 class="text-base font-bold text-white">宏观事件与 DeepSeek 推演</h2>
             </div>
+            <span class="text-[10px] bg-cyan-950 text-cyan-400 border border-cyan-800 px-2 py-0.5 rounded font-mono">7D FORWARD WINDOW</span>
         </div>
-        
-        <div class="card">
-            <div class="title">纳斯达克</div>
-            <div class="price">25980.19</div>
-            <div class="change green">
-                -0.76%
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="title">纳指 100 ETF (QQQM)</div>
-            <div class="price">290.81</div>
-            <div class="change green">
-                -1.0%
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="title">英伟达 (NVDA)</div>
-            <div class="price">208.48</div>
-            <div class="change green">
-                -2.91%
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="title">特斯拉 (TSLA)</div>
-            <div class="price">348.95</div>
-            <div class="change green">
-                -3.83%
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="title">Roundhill ETF (DRAM)</div>
-            <div class="price">54.28</div>
-            <div class="change green">
-                -5.89%
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="title">SK海力士 (SKHY)</div>
-            <div class="price">155.37</div>
-            <div class="change green">
-                -4.92%
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="title">VIX 恐慌指数</div>
-            <div class="price">15.85</div>
-            <div class="change red">
-                4.76%
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="title">NYMEX 原油</div>
-            <div class="price">84.51</div>
-            <div class="change green">
-                -0.59%
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="title">COMEX 黄金</div>
-            <div class="price">4704.8</div>
-            <div class="change red">
-                1.38%
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="title">COMEX 白银</div>
-            <div class="price">68.49</div>
-            <div class="change green">
-                -0.08%
-            </div>
-        </div>
-        
-    </div>
 
-    <h3>🇨🇳 A股核心指数与关注标的</h3>
-    <div class="grid">
-        
-        <div class="card">
-            <div class="title">上证指数</div>
-            <div class="price">3889.83</div>
-            <div class="change red">
-                0.2%
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="title">深证成指</div>
-            <div class="price">13747.91</div>
-            <div class="change green">
-                -0.34%
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="title">创业板指</div>
-            <div class="price">3398.27</div>
-            <div class="change green">
-                -0.98%
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="title">新易盛</div>
-            <div class="price">400.99</div>
-            <div class="change green">
-                -2.67%
-            </div>
-        </div>
-        
-        <div class="card">
-            <div class="title">四川黄金</div>
-            <div class="price">55.67</div>
-            <div class="change green">
-                -1.64%
-            </div>
-        </div>
-        
-    </div>
+        <div class="space-y-4">
+            
+            <div class="bg-gray-900/40 border border-gray-800 rounded-lg p-4 relative overflow-hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">🇺🇸</span>
+                        <h3 class="font-bold text-sm text-gray-200">美国 7 月核心 PCE 物价指数 (YoY / MoM)</h3>
+                    </div>
+                    <div class="text-xs font-mono text-cyan-400/80 bg-gray-800/50 px-2.5 py-1 rounded w-fit">
+                        ⏱ 2026-08-26 20:30 (北京时间)
+                    </div>
+                </div>
 
-    <h3>📅 宏观事件与 DeepSeek 推演</h3>
-    
-    <div class="macro-card">
-        <div style="font-weight: bold; font-size: 16px;">🇺🇸 美国 7 月核心 PCE 物价指数 (YoY / MoM) <span style="font-size: 12px; color: #888;">(2026-08-26 20:30 (北京时间))</span></div>
-        <div style="font-size: 13px; color: #555; margin-top: 5px;">背景说明: 前值: 3.3% | 预测值: 3.3% (美联储降息路径核心参考)</div>
-        <div class="ai-box">
-            💡 <strong>DeepSeek 洞察：</strong> 核心PCE若高于3.3%：利空美股（英伟达/纳指）、日股及A股（新易盛）；利多美元、利空日元；黄金承压，原油利空。若低于3.3%：反向，利多美股、A股成长（新易盛）、黄金原油，利空美元、利多日元。四川黄金关联弱，跟随金价。
-        </div>
-    </div>
-    
-    <div class="macro-card">
-        <div style="font-weight: bold; font-size: 16px;">🇺🇸 美国 Q2 实际 GDP 季化修正值 & 个人消费支出 <span style="font-size: 12px; color: #888;">(2026-08-27 20:30 (北京时间))</span></div>
-        <div style="font-size: 13px; color: #555; margin-top: 5px;">背景说明: 前值: 1.5% | 预测值: 1.5% (衡量美经济软着陆形态)</div>
-        <div class="ai-box">
-            💡 <strong>DeepSeek 洞察：</strong> 若公布值>1.5%：利好美股（纳指/英伟达）、A股（新易盛）、油价；利空日元、黄金、四川黄金（避险降温）。
+                <div class="text-xs text-gray-400 mb-3 font-mono bg-gray-950/50 p-2 rounded border border-gray-800/50">
+                    📊 背景数据：前值: 3.3% | 预测值: 3.3% (美联储降息路径核心参考)
+                </div>
 
-若公布值<1.5%：利空美股、A股、油价；利多日元、黄金、四川黄金（避险升温）。
-        </div>
-    </div>
-    
-    <div class="macro-card">
-        <div style="font-weight: bold; font-size: 16px;">🇯🇵 日本央行 (BOJ) 货币政策会议纪要 & 汇率干预信号 <span style="font-size: 12px; color: #888;">(2026-08-28 07:50 (北京时间))</span></div>
-        <div style="font-size: 13px; color: #555; margin-top: 5px;">背景说明: 关注加息节奏及日元套利交易解包带来的全域流动性波动</div>
-        <div class="ai-box">
-            💡 <strong>DeepSeek 洞察：</strong> 若纪要偏鹰（暗示加息/减少购债）：日元升值触发套利平仓，利空美股（英伟达/纳指）、A股（新易盛），利多日元；黄金承压，原油偏弱，四川黄金短线抗跌。  
-若偏鸽（维持宽松）：日元贬值，利好美股/A股成长股，利空日元；黄金原油温和承压，四川黄金随大盘。
-        </div>
-    </div>
-    
-</div>
+                <div class="bg-cyan-950/20 border border-cyan-800/40 rounded p-3 text-xs text-cyan-200/90 leading-relaxed">
+                    <div class="font-bold text-[10px] text-cyan-400 mb-1 flex items-center gap-1 font-mono">
+                        <span>💡</span> DEEPSEEK SCENARIO INSIGHT
+                    </div>
+                    若核心PCE>3.3%：利空美股（英伟达/纳指跳水）、利空A股（新易盛承压，四川黄金抗跌）、利空日元（贬值）、利多黄金，利空原油。
 
-<!-- 前端自动刷新倒计时逻辑 -->
-<script>
-    // 每 30 秒自动刷新一次网页拉取最新的编译数据
-    setInterval(function() {
-        fetch(window.location.href, {cache: "no-store"}).then(function() {
-            window.location.reload();
-        });
-    }, 30000);
-</script>
+若核心PCE≤3.3%：利多美股（纳指反弹）、利多A股（新易盛涨）、利多日元（升值）、利多黄金（降息预期），利多原油。
+                </div>
+            </div>
+            
+            <div class="bg-gray-900/40 border border-gray-800 rounded-lg p-4 relative overflow-hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">🇺🇸</span>
+                        <h3 class="font-bold text-sm text-gray-200">美国 Q2 实际 GDP 季化修正值 & 个人消费支出</h3>
+                    </div>
+                    <div class="text-xs font-mono text-cyan-400/80 bg-gray-800/50 px-2.5 py-1 rounded w-fit">
+                        ⏱ 2026-08-27 20:30 (北京时间)
+                    </div>
+                </div>
+
+                <div class="text-xs text-gray-400 mb-3 font-mono bg-gray-950/50 p-2 rounded border border-gray-800/50">
+                    📊 背景数据：前值: 1.5% | 预测值: 1.5% (衡量美经济软着陆形态)
+                </div>
+
+                <div class="bg-cyan-950/20 border border-cyan-800/40 rounded p-3 text-xs text-cyan-200/90 leading-relaxed">
+                    <div class="font-bold text-[10px] text-cyan-400 mb-1 flex items-center gap-1 font-mono">
+                        <span>💡</span> DEEPSEEK SCENARIO INSIGHT
+                    </div>
+                    若GDP及PCE高于预期：经济韧性强，利多美股（英伟达/纳指）及原油；美元走强利空日元、黄金；A股（四川黄金/新易盛）中性偏空。  
+若低于预期：衰退担忧升温，利空美股、原油、日元；利多黄金避险，A股分化为黄金涨、算力跌。
+                </div>
+            </div>
+            
+            <div class="bg-gray-900/40 border border-gray-800 rounded-lg p-4 relative overflow-hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">🇯🇵</span>
+                        <h3 class="font-bold text-sm text-gray-200">日本央行 (BOJ) 货币政策会议纪要 & 汇率干预信号</h3>
+                    </div>
+                    <div class="text-xs font-mono text-cyan-400/80 bg-gray-800/50 px-2.5 py-1 rounded w-fit">
+                        ⏱ 2026-08-28 07:50 (北京时间)
+                    </div>
+                </div>
+
+                <div class="text-xs text-gray-400 mb-3 font-mono bg-gray-950/50 p-2 rounded border border-gray-800/50">
+                    📊 背景数据：关注加息节奏及日元套利交易解包带来的全域流动性波动
+                </div>
+
+                <div class="bg-cyan-950/20 border border-cyan-800/40 rounded p-3 text-xs text-cyan-200/90 leading-relaxed">
+                    <div class="font-bold text-[10px] text-cyan-400 mb-1 flex items-center gap-1 font-mono">
+                        <span>💡</span> DEEPSEEK SCENARIO INSIGHT
+                    </div>
+                    若纪要偏鹰（暗示加息/缩表）：日元涨，套利交易平仓→美股（英伟达/纳指）利空，A股（新易盛）承压，四川黄金受益避险，原油利空。  
+若偏鸽（推迟加息）：日元贬，风险偏好回升→美股/A股利好，金价短空，原油利多。
+                </div>
+            </div>
+            
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="text-center text-[10px] text-gray-600 font-mono py-2">
+        数据仅供信息参考，不构成任何投资建议。 | Data via YFinance · GTImg · Finnhub · DeepSeek
+    </footer>
+
 </body>
 </html>
