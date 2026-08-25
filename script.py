@@ -30,7 +30,7 @@ def get_us_data():
         'NVDA': '英伟达 (NVDA)',
         'TSLA': '特斯拉 (TSLA)',
         'DRAM': 'Roundhill ETF (DRAM)',
-        '000660.KS': 'SK海力士 (000660)',  # 修正为韩股主板原生代码，避免SKHY引发的nan
+        'SKHY': 'SK海力士 (SKHY)',  
         '^VIX': 'VIX 恐慌指数',
         'CL=F': 'NYMEX 原油',
         'GC=F': 'COMEX 黄金',
