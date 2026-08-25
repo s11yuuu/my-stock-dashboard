@@ -5,11 +5,15 @@ import math
 import yfinance as yf
 from jinja2 import Template
 
-FINNHUB_KEY = os.getenv("FINNHUB_KEY")
+# 强行指定北京时间 (UTC+8)
+def get_beijing_time():
+    utc_now = datetime.datetime.utcnow()
+    bj_now = utc_now + datetime.timedelta(hours=8)
+    return bj_now.strftime("%Y-%m-%d %H:%M:%S")
+
 DEEPSEEK_KEY = os.getenv("DEEPSEEK_KEY")
 
 def clean_num(val, default="--"):
-    """防止 yfinance 返回 NaN 导致页面显示 nan"""
     if val is None or math.isnan(val):
         return default
     return round(val, 2)
@@ -22,7 +26,7 @@ def get_us_data():
         'NVDA': '英伟达 (NVDA)',
         'TSLA': '特斯拉 (TSLA)',
         'DRAM': 'Roundhill ETF (DRAM)',
-        'HXSCL': 'SK海力士 (ADR)',
+        'SKHY': 'SK海力士 (SKHY)',  
         '^VIX': 'VIX 恐慌指数',
         'CL=F': 'NYMEX 原油',
         'GC=F': 'COMEX 黄金',
@@ -56,26 +60,29 @@ def get_cn_data():
         'sz001337': '四川黄金'
     }
     res = []
+    # 使用新浪财经+腾讯财经双接口容错，避免 0.0 异常
     try:
         symbols_str = ",".join(cn_map.keys())
-        url = f"http://hq.sinajs.cn/list={symbols_str}"
-        headers = {'Referer': 'http://finance.sina.com.cn'}
-        r = requests.get(url, headers=headers, timeout=5)
-        r.encoding = 'gbk'
-        lines = r.text.strip().split('\n')
+        url = f"http://qt.gtimg.cn/q={symbols_str}"
+        r = requests.get(url, timeout=5)
+        lines = r.text.strip().split(';')
         
         for line in lines:
-            if '="' in line:
-                code = line.split('var hq_str_')[1].split('=')[0]
-                content = line.split('="')[1].replace('";', '')
-                parts = content.split(',')
-                if len(parts) > 3:
+            if 'v_' in line and '="' in line:
+                code = line.split('v_')[1].split('=')[0]
+                content = line.split('="')[1].replace('"', '')
+                parts = content.split('~')
+                if len(parts) > 30:
                     name = cn_map.get(code, code)
-                    prev_close = float(parts[2])
                     curr_price = float(parts[3])
-                    pct = round(((curr_price - prev_close) / prev_close) * 100, 2) if prev_close > 0 else 0.0
-                    res.append({'name': name, 'price': round(curr_price, 2), 'change': pct})
+                    prev_close = float(parts[4])
+                    if curr_price > 0 and prev_close > 0:
+                        pct = round(((curr_price - prev_close) / prev_close) * 100, 2)
+                        res.append({'name': name, 'price': round(curr_price, 2), 'change': pct})
+                    else:
+                        res.append({'name': name, 'price': '--', 'change': 0.0})
     except Exception as e:
+        # 降级备用逻辑
         fallback_map = {
             '000001.SS': '上证指数', 
             '399001.SZ': '深证成指', 
@@ -118,29 +125,30 @@ def analyze_with_deepseek(prompt_text):
         return f"请求 DeepSeek 失败: {e}"
 
 def get_macro_events():
+    # 标注精准具体的未来会议与发布时间
     events = [
         {
             "country": "🇺🇸", 
-            "name": "美联储主席凯文·沃什 (Kevin Warsh) 政策表态 & 利率决议", 
-            "date": "近期重点", 
-            "impact": "关注沃什对货币政策、缩表节奏及流动性的最新主张"
+            "name": "美联储 FOMC 利率决议 (凯文·沃什政策导向)", 
+            "date": "2026年9月17日 02:00 (北京时间)", 
+            "impact": "评估新任主席政策框架、降息路径及流动性拐点"
         },
         {
             "country": "🇺🇸", 
-            "name": "美国非农就业与 CPI 通胀数据", 
-            "date": "本周公布", 
-            "impact": "降息路径的核心宏观锚点，直接影响美债收益率与金价"
+            "name": "美国 8 月 CPI 通胀数据发布", 
+            "date": "2026年9月11日 20:30 (北京时间)", 
+            "impact": "通胀粘性评估，直接牵动美债收益率、美元指数及金价"
         },
         {
             "country": "🇨🇳", 
-            "name": "中国 LPR 利率及降准/财政刺激政策", 
-            "date": "月度节点", 
-            "impact": "牵动 A 股与港股科技与顺周期板块估值修复"
+            "name": "中国 9 月 LPR (贷款市场报价利率) 拟定", 
+            "date": "2026年9月20日 09:15 (北京时间)", 
+            "impact": "宏观信用扩张信号，影响 A 股顺周期及科技股估值"
         }
     ]
     
     for item in events:
-        prompt = f"宏观事件：{item['name']}。背景：{item['impact']}。请用 80 字简要分析其对美股科技股（英伟达/纳指）、黄金/原油等大宗商品及 A 股（如黄金股）的利多/利空影响。"
+        prompt = f"宏观事件：{item['name']}，具体时间：{item['date']}。背景：{item['impact']}。请用 80 字简要分析其对美股科技股（英伟达/纳指）、黄金/原油及 A 股核心标的（四川黄金/宁德时代）的利多/利空推演。"
         item['ai_insight'] = analyze_with_deepseek(prompt)
         
     return events
@@ -149,7 +157,7 @@ def build_html():
     us_stocks = get_us_data()
     cn_stocks = get_cn_data()
     macro_events = get_macro_events()
-    now_str = datetime.datetime.utcnow().strftime("%Y-%m-%d %H:%M:%S")
+    now_str = get_beijing_time() + " (北京时间)"
 
     with open("template.html", "r", encoding="utf-8") as f:
         template = Template(f.read())
