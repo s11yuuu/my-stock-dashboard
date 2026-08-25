@@ -2,73 +2,140 @@
 <html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
-    <title>股市与宏观监控面板</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>中美市场脉冲 | Terminal</title>
+    <script src="https://cdn.tailwindcss.com"></script>
     <style>
-        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; background: #f5f6f8; margin: 0; padding: 20px; color: #333; }
-        .container { max-width: 1000px; margin: 0 auto; }
-        .header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-        .grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; margin-bottom: 25px; }
-        .card { background: #fff; padding: 18px; border-radius: 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.04); }
-        .card .title { font-size: 14px; color: #666; font-weight: 600; margin-bottom: 8px; }
-        .card .price { font-size: 22px; font-weight: bold; margin-bottom: 4px; }
-        .green { color: #00b060; } .red { color: #ff3b30; }
-        .macro-card { background: #fff; padding: 20px; border-radius: 12px; margin-bottom: 15px; border-left: 4px solid #0066ff; }
-        .ai-box { background: #f0f5ff; padding: 12px; border-radius: 8px; font-size: 13px; line-height: 1.5; margin-top: 10px; }
+        body {
+            background-color: #0b0f19;
+            color: #e2e8f0;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+        }
+        .terminal-card {
+            background: #111827;
+            border: 1px solid #1f2937;
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.5);
+        }
+        .up-red { color: #f87171; }
+        .down-green { color: #4ade80; }
+        .up-green-us { color: #4ade80; }
+        .down-red-us { color: #f87171; }
     </style>
 </head>
-<body>
-<div class="container">
-    <div class="header">
-        <h2>中美股市与宏观数据监控</h2>
-        <span style="font-size: 12px; color: #888;">后台同步: {{ update_time }} (UTC) | <span id="live-status" style="color:#00b060;">● 前端实时轮询中</span></span>
-    </div>
+<body class="p-4 md:p-8 max-w-7xl mx-auto">
 
-    <h3>🇺🇸 美股指数及关注标的</h3>
-    <div class="grid">
-        {% for item in us_stocks %}
-        <div class="card">
-            <div class="title">{{ item.name }}</div>
-            <div class="price">{{ item.price }}</div>
-            <div class="change {% if item.change >= 0 %}red{% else %}green{% endif %}">
-                {{ item.change }}%
+    <!-- 顶部 Header -->
+    <header class="terminal-card rounded-xl p-6 mb-6 flex flex-col md:flex-row justify-between items-start md:items-center">
+        <div>
+            <div class="text-xs font-mono text-cyan-400 tracking-wider mb-1">MARKET INTELLIGENCE TERMINAL</div>
+            <h1 class="text-2xl font-bold text-white tracking-tight">中美市场脉冲</h1>
+            <p class="text-xs text-gray-400 mt-1">跨市场行情、宏观事件与 DeepSeek 情景推演，小时级静态快照呈现。</p>
+        </div>
+        <div class="mt-4 md:mt-0 flex items-center gap-4 text-xs font-mono">
+            <div class="bg-gray-800/80 px-3 py-2 rounded-lg border border-gray-700">
+                <span class="text-gray-400">SYSTEM UPDATED:</span>
+                <span class="text-cyan-400 font-bold ml-1">{{ update_time }}</span>
+            </div>
+            <div class="bg-gray-800/80 px-3 py-2 rounded-lg border border-gray-700 flex items-center gap-2">
+                <span class="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
+                <span class="text-gray-300">数据快照已载入</span>
             </div>
         </div>
-        {% endfor %}
-    </div>
+    </header>
 
-    <h3>🇨🇳 A股核心指数与关注标的</h3>
-    <div class="grid">
-        {% for item in cn_stocks %}
-        <div class="card">
-            <div class="title">{{ item.name }}</div>
-            <div class="price">{{ item.price }}</div>
-            <div class="change {% if item.change >= 0 %}red{% else %}green{% endif %}">
-                {{ item.change }}%
+    <!-- 主体 Grid 网格：美股与 A股 -->
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 mb-6">
+        
+        <!-- 美股 & 大宗商品 -->
+        <section class="terminal-card rounded-xl p-5">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-800">
+                <div>
+                    <span class="text-[10px] font-mono text-cyan-400 block">GLOBAL MARKETS</span>
+                    <h2 class="text-base font-bold text-white">美股 · 大宗商品</h2>
+                </div>
+                <span class="text-[10px] text-gray-500 font-mono">国际色彩：绿涨红跌</span>
             </div>
-        </div>
-        {% endfor %}
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {% for item in us_stocks %}
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="{{ item.name }}">{{ item.name }}</div>
+                    <div class="text-lg font-mono font-bold text-white">{{ item.price }}</div>
+                    <div class="text-xs font-mono mt-1 
+                        {% if item.change > 0 %}up-green-us{% elif item.change < 0 %}down-red-us{% else %}text-gray-400{% endif %}">
+                        {% if item.change > 0 %}+{% endif %}{{ item.change }}%
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
+        <!-- A 股核心标的 -->
+        <section class="terminal-card rounded-xl p-5">
+            <div class="flex justify-between items-center mb-4 pb-2 border-b border-gray-800">
+                <div>
+                    <span class="text-[10px] font-mono text-cyan-400 block">CHINA A-SHARES</span>
+                    <h2 class="text-base font-bold text-white">A 股核心标的</h2>
+                </div>
+                <span class="text-[10px] text-gray-500 font-mono">中国色彩：红涨绿跌</span>
+            </div>
+            <div class="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                {% for item in cn_stocks %}
+                <div class="bg-gray-900/60 border border-gray-800/80 rounded-lg p-3 hover:border-cyan-500/30 transition">
+                    <div class="text-xs text-gray-400 truncate mb-1" title="{{ item.name }}">{{ item.name }}</div>
+                    <div class="text-lg font-mono font-bold text-white">{{ item.price }}</div>
+                    <div class="text-xs font-mono mt-1 
+                        {% if item.change > 0 %}up-red{% elif item.change < 0 %}down-green{% else %}text-gray-400{% endif %}">
+                        {% if item.change > 0 %}+{% endif %}{{ item.change }}%
+                    </div>
+                </div>
+                {% endfor %}
+            </div>
+        </section>
+
     </div>
 
-    <h3>📅 宏观事件与 DeepSeek 推演</h3>
-    {% for ev in macro_events %}
-    <div class="macro-card">
-        <div style="font-weight: bold; font-size: 16px;">{{ ev.country }} {{ ev.name }} <span style="font-size: 12px; color: #888;">({{ ev.date }})</span></div>
-        <div style="font-size: 13px; color: #555; margin-top: 5px;">背景说明: {{ ev.impact }}</div>
-        <div class="ai-box">
-            💡 <strong>DeepSeek 洞察：</strong> {{ ev.ai_insight }}
+    <!-- 宏观事件与 DeepSeek 推演 -->
+    <section class="terminal-card rounded-xl p-5 mb-6">
+        <div class="flex justify-between items-center mb-6 pb-2 border-b border-gray-800">
+            <div>
+                <span class="text-[10px] font-mono text-cyan-400 block">MACRO EVENT RADAR</span>
+                <h2 class="text-base font-bold text-white">宏观事件与 DeepSeek 推演</h2>
+            </div>
+            <span class="text-[10px] bg-cyan-950 text-cyan-400 border border-cyan-800 px-2 py-0.5 rounded font-mono">7D FORWARD WINDOW</span>
         </div>
-    </div>
-    {% endfor %}
-</div>
 
-<!-- 前端自动刷新倒计时逻辑 -->
-<script>
-    // 每 30 秒自动刷新一次网页拉取最新的编译数据
-    setInterval(function() {
-        fetch(window.location.href, {cache: "no-store"}).then(function() {
-            window.location.reload();
-        });
-    }, 30000);
-</script>
+        <div class="space-y-4">
+            {% for item in macro_events %}
+            <div class="bg-gray-900/40 border border-gray-800 rounded-lg p-4 relative overflow-hidden">
+                <div class="flex flex-col md:flex-row md:items-center justify-between gap-2 mb-3">
+                    <div class="flex items-center gap-2">
+                        <span class="text-lg">{{ item.country }}</span>
+                        <h3 class="font-bold text-sm text-gray-200">{{ item.name }}</h3>
+                    </div>
+                    <div class="text-xs font-mono text-cyan-400/80 bg-gray-800/50 px-2.5 py-1 rounded w-fit">
+                        ⏱ {{ item.date }}
+                    </div>
+                </div>
+
+                <div class="text-xs text-gray-400 mb-3 font-mono bg-gray-950/50 p-2 rounded border border-gray-800/50">
+                    📊 背景数据：{{ item.impact }}
+                </div>
+
+                <div class="bg-cyan-950/20 border border-cyan-800/40 rounded p-3 text-xs text-cyan-200/90 leading-relaxed">
+                    <div class="font-bold text-[10px] text-cyan-400 mb-1 flex items-center gap-1 font-mono">
+                        <span>💡</span> DEEPSEEK SCENARIO INSIGHT
+                    </div>
+                    {{ item.ai_insight }}
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </section>
+
+    <!-- 页脚 -->
+    <footer class="text-center text-[10px] text-gray-600 font-mono py-2">
+        数据仅供信息参考，不构成任何投资建议。 | Data via YFinance · GTImg · Finnhub · DeepSeek
+    </footer>
+
 </body>
 </html>
